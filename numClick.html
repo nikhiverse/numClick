@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NumClick Challenge</title>
+    <link href="numClick.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div id="game-wrapper">
+      <h1 id="title">NumClick Challenge</h1>
+
+      <!-- Setup Screen -->
+      <div id="setup-screen">
+        <!-- Game Type -->
+        <div class="setup-section">
+          <h3>Game Type</h3>
+          <div class="difficulty-options">
+            <div class="radio-option selected" data-option="gameType">
+              <input
+                type="radio"
+                name="gameType"
+                id="normal"
+                value="normal"
+                checked
+              />
+              <label for="normal">Normal (01-64)</label>
+            </div>
+            <div class="radio-option" data-option="gameType">
+              <input type="radio" name="gameType" id="expand" value="expand" />
+              <label for="expand">Expand (01-99)</label>
+            </div>
+            <div class="radio-option" data-option="gameType">
+              <input type="radio" name="gameType" id="insane" value="insane" />
+              <label for="insane">Insane (100-999)</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sorting Order -->
+        <div class="setup-section">
+          <h3>Select Sorting</h3>
+          <div class="difficulty-options">
+            <div class="radio-option selected" data-option="sortOrder">
+              <input
+                type="radio"
+                name="sortOrder"
+                id="ascending"
+                value="ascending"
+                checked
+              />
+              <label for="ascending">Ascending Sort</label>
+            </div>
+            <div class="radio-option" data-option="sortOrder">
+              <input
+                type="radio"
+                name="sortOrder"
+                id="descending"
+                value="descending"
+              />
+              <label for="descending">Descending Sort</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Click Feedback -->
+        <div class="setup-section">
+          <h3>Click Feedback</h3>
+          <div class="difficulty-options">
+            <div class="radio-option selected" data-option="clickFeedback">
+              <input
+                type="radio"
+                name="clickFeedback"
+                id="enabled"
+                value="enabled"
+                checked
+              />
+              <label for="enabled">Color Enable</label>
+            </div>
+            <div class="radio-option" data-option="clickFeedback">
+              <input
+                type="radio"
+                name="clickFeedback"
+                id="disabled"
+                value="disabled"
+              />
+              <label for="disabled">Color Disable</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timer Mode -->
+        <div class="setup-section">
+          <h3>Timer Mode</h3>
+          <div class="difficulty-options">
+            <div class="radio-option selected" data-option="timerMode">
+              <input
+                type="radio"
+                name="timerMode"
+                id="normalTime"
+                value="normal"
+                checked
+              />
+              <label for="normalTime">⏱️ CountUp Timer</label>
+            </div>
+            <div class="radio-option" data-option="timerMode">
+              <input
+                type="radio"
+                name="timerMode"
+                id="countdown"
+                value="countdown"
+              />
+              <label for="countdown">⏳ Countdown Timer</label>
+            </div>
+          </div>
+
+          <!-- Countdown Time Selector (hidden by default) -->
+          <div id="countdown-selector" style="display: none; margin-top: 15px">
+            <label
+              for="countdown-minutes"
+              style="
+                color: #ffffff;
+                display: block;
+                margin-bottom: 10px;
+                font-size: 0.9rem;
+              "
+            >
+              Select Time Limit:
+            </label>
+            <input
+              type="range"
+              id="countdown-minutes"
+              min="1"
+              max="5"
+              value="3"
+              style="width: 100%; cursor: pointer; accent-color: #0096ff"
+            />
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                color: #888;
+                font-size: 0.85rem;
+                margin-top: 5px;
+              "
+            >
+              <span>1 min</span>
+              <span>2 min</span>
+              <span id="selected-time" style="color: #0096ff; font-weight: 600"
+                >3 min</span
+              >
+              <span>4 min</span>
+              <span>5 min</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="start-btn" onclick="game.startGame()">
+          Start New Game
+        </button>
+      </div>
+
+      <!-- Game Screen -->
+      <div id="game-screen">
+        <div id="game-header">
+          <div class="game-info">
+            Mode: <span id="mode-display">Normal</span>
+          </div>
+          <div class="game-info">
+            Sort: <span id="sort-display">Ascending</span>
+          </div>
+          <div class="game-info">
+            Click: <span id="click-display">Enabled</span>
+          </div>
+        </div>
+
+        <div id="game-container">
+          <div id="timer-container">
+            <div id="medal-container">
+              <div class="icon">🏅</div>
+              <div id="match">00/64</div>
+            </div>
+            <div id="trophy-container">
+              <div class="icon">🏆</div>
+              <div id="score">--:--</div>
+            </div>
+            <div id="clock-container">
+              <div class="icon">⏱️</div>
+              <div id="watch">00:00</div>
+            </div>
+          </div>
+          <div id="square-container"></div>
+          <div id="control-buttons">
+            <button
+              id="new-game-btn"
+              class="control-btn"
+              onclick="game.backToSetup()"
+            >
+              New Game
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="numClick.js"></script>
+  </body>
+</html>
