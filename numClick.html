@@ -139,18 +139,39 @@
               style="
                 display: flex;
                 justify-content: space-between;
-                color: #888;
-                font-size: 0.85rem;
                 margin-top: 5px;
               "
             >
-              <span>1 min</span>
-              <span>2 min</span>
-              <span id="selected-time" style="color: #0096ff; font-weight: 600"
+              <span
+                class="time-label"
+                data-value="1"
+                style="color: #888; font-size: 0.85rem"
+                >1 min</span
+              >
+              <span
+                class="time-label"
+                data-value="2"
+                style="color: #888; font-size: 0.85rem"
+                >2 min</span
+              >
+              <span
+                class="time-label"
+                data-value="3"
+                style="color: #0096ff; font-weight: 600; font-size: 0.85rem"
                 >3 min</span
               >
-              <span>4 min</span>
-              <span>5 min</span>
+              <span
+                class="time-label"
+                data-value="4"
+                style="color: #888; font-size: 0.85rem"
+                >4 min</span
+              >
+              <span
+                class="time-label"
+                data-value="5"
+                style="color: #888; font-size: 0.85rem"
+                >5 min</span
+              >
             </div>
           </div>
         </div>
@@ -196,7 +217,7 @@
               class="control-btn"
               onclick="game.backToSetup()"
             >
-              New Game
+              Main Menu
             </button>
           </div>
         </div>

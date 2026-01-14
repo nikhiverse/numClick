@@ -66,14 +66,26 @@ class NumClickGame {
       });
     });
 
-    // Update countdown time display
+    // Update countdown time display and highlight the correct label
     const rangeInput = document.getElementById("countdown-minutes");
-    const selectedTimeDisplay = document.getElementById("selected-time");
+    const labels = document.querySelectorAll(".time-label");
 
-    rangeInput.addEventListener("input", (e) => {
-      const minutes = e.target.value;
-      selectedTimeDisplay.textContent = `${minutes} min`;
-    });
+    if (rangeInput) {
+      rangeInput.addEventListener("input", (e) => {
+        const selectedVal = parseInt(e.target.value);
+
+        labels.forEach((label) => {
+          // Check the data-value attribute we added to the spans
+          if (parseInt(label.getAttribute("data-value")) === selectedVal) {
+            label.style.color = "#0096ff"; // Highlight selected in blue
+            label.style.fontWeight = "600";
+          } else {
+            label.style.color = "#888"; // Dim others
+            label.style.fontWeight = "400";
+          }
+        });
+      });
+    }
   }
 
   startGame() {
@@ -122,17 +134,24 @@ class NumClickGame {
   }
 
   backToSetup() {
-    // Stop timer if running
+    // Only show confirmation if the game is actually running
+    if (this.startTime && !this.gameOver) {
+      this.showModal("confirmExit");
+    } else {
+      // If game isn't started or is already over, go back immediately
+      this.confirmBackToSetup();
+    }
+  }
+
+  confirmBackToSetup() {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
     }
 
-    // Show setup, hide game
     document.getElementById("setup-screen").style.display = "block";
     document.getElementById("game-screen").style.display = "none";
 
-    // Reset game state
     this.gameOver = false;
     this.currentIndex = 0;
     this.startTime = null;
@@ -241,11 +260,6 @@ class NumClickGame {
 
     if (this.gameOver || button.disabled) return;
 
-    // Start timer on first click
-    if (this.currentIndex === 0 && !this.startTime) {
-      this.startTimer();
-    }
-
     const expectedNumber = this.sortedNumbers[this.currentIndex];
 
     if (number === expectedNumber) {
@@ -293,7 +307,7 @@ class NumClickGame {
 
       this.disableAllButtons();
       this.stopTimer();
-      this.handleLoss();
+      this.handleLoss(number);
     }
   }
 
@@ -418,13 +432,13 @@ class NumClickGame {
     }, CONFIG.WIN_DELAY);
   }
 
-  handleLoss() {
+  handleLoss(clickedNum) {
     setTimeout(() => {
-      this.showModal("lose");
+      this.showModal("lose", "", false, clickedNum);
     }, CONFIG.LOSE_DELAY);
   }
 
-  showModal(type, timeString = "", isBestScore = false) {
+  showModal(type, timeString = "", isBestScore = false, clickedNum = null) {
     const modal = document.createElement("div");
     modal.id = "game-modal";
 
@@ -457,7 +471,7 @@ class NumClickGame {
                 }
               </div>
               <button class="modal-btn" onclick="game.closeModal(); game.backToSetup();">
-                New Game
+                Main Menu
               </button>
             </div>
           `;
@@ -475,10 +489,25 @@ class NumClickGame {
       }</strong></div>
               </div>
               <button class="modal-btn" onclick="game.closeModal(); game.backToSetup();">
-                New Game
+                Main Menu
               </button>
             </div>
           `;
+    } else if (type == "confirmExit") {
+      modal.innerHTML = `
+        <div class="modal-content">
+          <h2>⚠️ Quit Game?</h2>
+          <p>Are you sure you want to go back to the main menu? Your current progress will be lost.</p>
+          <div class="modal-buttons" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+            <button class="modal-btn" style="background: #ef5350;" onclick="game.closeModal(); game.confirmBackToSetup();">
+              Yes!
+            </button>
+            <button class="modal-btn" onclick="game.closeModal();">
+              No
+            </button>
+          </div>
+        </div>
+    `;
     } else {
       const expectedNum = this.formatNumber(
         this.sortedNumbers[this.currentIndex]
@@ -489,11 +518,16 @@ class NumClickGame {
               <h2>❌ Game Over</h2>
               <p>You clicked the wrong number!</p>
               <div class="modal-stats">
-                <div>Progress: <strong>${this.currentIndex}/${this.sortedNumbers.length}</strong></div>
+                <div>Progress: <strong>${this.currentIndex}/${
+        this.sortedNumbers.length
+      }</strong></div>
                 <div>Expected: <strong>${expectedNum}</strong></div>
+                <div>Clicked: <strong>${this.formatNumber(
+                  clickedNum
+                )}</strong></div>
               </div>
               <button class="modal-btn" onclick="game.closeModal(); game.backToSetup();">
-                New Game
+                Main Menu
               </button>
             </div>
           `;
@@ -553,6 +587,9 @@ class NumClickGame {
 
     // Create new board
     this.createBoard();
+
+    // FIX: Start the timer immediately after the board is created
+    this.startTimer();
   }
 
   loadBestScores() {
