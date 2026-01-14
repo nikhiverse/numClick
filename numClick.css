@@ -22,10 +22,26 @@ body {
   width: 100%;
 }
 
+/* Add this to your CSS file */
+#header-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px; /* Space between logo and text */
+  margin-bottom: 20px;
+}
+
+#header-logo {
+  width: 60px; /* Adjust size as needed */
+  height: 60px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(0, 150, 255, 0.5));
+}
+
 #title {
   color: #ffffff;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   font-size: 1.8rem;
   text-shadow: 0 0 20px rgba(0, 150, 255, 0.5);
 }

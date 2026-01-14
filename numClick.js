@@ -607,3 +607,14 @@ class NumClickGame {
 
 // Initialize game
 const game = new NumClickGame();
+
+//To prevent accidental reloads
+window.addEventListener("beforeunload", (event) => {
+  // Only trigger if the game is currently active
+  if (game.startTime && !game.gameOver) {
+    // Standard way to trigger the browser's confirmation dialog
+    event.preventDefault();
+    // Modern browsers require the returnValue to be set
+    event.returnValue = "";
+  }
+});
