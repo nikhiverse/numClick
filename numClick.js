@@ -38,6 +38,7 @@ class NumClickGame {
 
   attachSetupListeners() {
     // Radio button selection highlighting
+    // Radio button selection highlighting AND visibility logic
     document.querySelectorAll(".radio-option").forEach((option) => {
       option.addEventListener("click", (e) => {
         const input = option.querySelector('input[type="radio"]');
@@ -51,17 +52,15 @@ class NumClickGame {
             radio.closest(".radio-option").classList.remove("selected");
           });
         option.classList.add("selected");
-      });
-    });
 
-    // Show/hide countdown selector based on timer mode
-    document.querySelectorAll('input[name="timerMode"]').forEach((radio) => {
-      radio.addEventListener("change", (e) => {
+        // FIX: Manually trigger the visibility check for the countdown selector
         const countdownSelector = document.getElementById("countdown-selector");
-        if (e.target.value === "countdown") {
-          countdownSelector.style.display = "block";
-        } else {
-          countdownSelector.style.display = "none";
+        if (groupName === "timerMode") {
+          if (input.value === "countdown") {
+            countdownSelector.style.display = "block";
+          } else {
+            countdownSelector.style.display = "none";
+          }
         }
       });
     });
