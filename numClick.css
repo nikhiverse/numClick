@@ -202,6 +202,7 @@ body {
 
 #game-container {
   display: flex;
+  width: 100%;
   flex-direction: column;
   background: rgba(255, 255, 255, 0.05);
   padding: 10px;
@@ -310,14 +311,19 @@ body {
   padding: 5px;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.3);
-  display: inline-block;
+  display: flex; /* Changed from inline-block */
+  flex-direction: column;
+  width: 100%; /* Ensure it fills the container */
+  max-width: 500px; /* Limits size on desktop */
+  aspect-ratio: 1 / 1; /* Keeps it a perfect square */
   margin: 0 auto;
 }
 
 .grid-row {
   display: flex;
-  gap: 2px;
-  margin-bottom: 2px;
+  flex: 1; /* Rows share height equally */
+  gap: 4px; /* Slightly larger gap for clarity */
+  margin-bottom: 4px;
 }
 
 /* Fallback for older browsers without gap support */
@@ -337,17 +343,16 @@ body {
 
 .square-btn {
   border: none;
-  width: 60px;
-  height: 60px;
-  border-radius: 8px;
+  flex: 1; /* Buttons share width equally */
+  height: 100%; /* Fill the row height */
+  border-radius: 6px;
   background: linear-gradient(135deg, #4fc3f7 0%, #2196f3 100%);
   color: #0d47a1;
-  font-size: 20px;
+  font-size: clamp(12px, 4vw, 20px); /* Responsive font size */
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  -webkit-transition: all 0.2s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Only apply hover on devices that support hover */
