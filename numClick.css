@@ -22,20 +22,26 @@ body {
   padding: 10px;
 }
 
-/* Add this to your CSS file */
+/* Header with Logo */
 #header-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px; /* Space between logo and text */
+  gap: 15px;
   margin-bottom: 20px;
 }
 
 #header-logo {
-  width: 60px; /* Adjust size as needed */
+  width: 60px;
   height: 60px;
   object-fit: contain;
-  filter: drop-shadow(0 0 10px rgba(0, 150, 255, 0.5));
+}
+
+/* Enhanced logo drop-shadow with fallback */
+@supports (filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5))) {
+  #header-logo {
+    filter: drop-shadow(0 0 10px rgba(0, 150, 255, 0.5));
+  }
 }
 
 #title {
@@ -51,8 +57,17 @@ body {
   background: rgba(255, 255, 255, 0.05);
   padding: 30px;
   border-radius: 15px;
-  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced backdrop-filter with vendor prefix and fallback */
+@supports (
+  (-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))
+) {
+  #setup-screen {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
 }
 
 .setup-section {
@@ -71,6 +86,16 @@ body {
   gap: 12px;
 }
 
+/* Fallback for older browsers without gap support */
+@supports not (gap: 12px) {
+  .difficulty-options > * {
+    margin-bottom: 12px;
+  }
+  .difficulty-options > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
 .radio-option {
   display: flex;
   align-items: center;
@@ -79,12 +104,16 @@ body {
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
+  -webkit-transition: all 0.3s ease;
   border: 2px solid transparent;
 }
 
-.radio-option:hover {
-  background: rgba(0, 150, 255, 0.1);
-  border-color: #0096ff;
+/* Only apply hover on devices that support hover */
+@media (hover: hover) and (pointer: fine) {
+  .radio-option:hover {
+    background: rgba(0, 150, 255, 0.1);
+    border-color: #0096ff;
+  }
 }
 
 .radio-option input[type="radio"] {
@@ -118,12 +147,22 @@ body {
   font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  -webkit-transition: all 0.3s ease;
   margin-top: 15px;
 }
 
-.start-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 150, 255, 0.5);
+/* Only apply hover on devices that support hover */
+@media (hover: hover) and (pointer: fine) {
+  .start-btn:hover {
+    transform: translateY(-3px);
+    -webkit-transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 150, 255, 0.5);
+  }
+}
+
+.start-btn:active {
+  transform: translateY(-1px);
+  -webkit-transform: translateY(-1px);
 }
 
 /* Game Screen */
@@ -143,6 +182,13 @@ body {
   gap: 10px;
 }
 
+/* Fallback for older browsers without gap support */
+@supports not (gap: 10px) {
+  #game-header > * {
+    margin: 5px;
+  }
+}
+
 .game-info {
   color: #0096ff;
   font-weight: 500;
@@ -160,8 +206,17 @@ body {
   background: rgba(255, 255, 255, 0.05);
   padding: 10px;
   border-radius: 15px;
-  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced backdrop-filter with vendor prefix */
+@supports (
+  (-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))
+) {
+  #game-container {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
 }
 
 #timer-container {
@@ -170,6 +225,13 @@ body {
   margin-bottom: 20px;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+/* Fallback for older browsers without gap support */
+@supports not (gap: 10px) {
+  #timer-container > * {
+    margin: 5px;
+  }
 }
 
 #medal-container,
@@ -183,6 +245,20 @@ body {
   border-radius: 8px;
 }
 
+/* Fallback for older browsers without gap support */
+@supports not (gap: 8px) {
+  #medal-container > *,
+  #trophy-container > *,
+  #clock-container > * {
+    margin-right: 8px;
+  }
+  #medal-container > *:last-child,
+  #trophy-container > *:last-child,
+  #clock-container > *:last-child {
+    margin-right: 0;
+  }
+}
+
 #clock-container.countdown-mode {
   background: rgba(255, 152, 0, 0.3);
   border: 2px solid #ff9800;
@@ -191,7 +267,19 @@ body {
 #clock-container.countdown-warning {
   background: rgba(255, 82, 82, 0.3);
   border: 2px solid #ff5252;
+  -webkit-animation: pulse 1s ease-in-out infinite;
   animation: pulse 1s ease-in-out infinite;
+}
+
+/* Webkit prefix for pulse animation */
+@-webkit-keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 @keyframes pulse {
@@ -232,6 +320,17 @@ body {
   margin-bottom: 2px;
 }
 
+/* Fallback for older browsers without gap support */
+@supports not (gap: 2px) {
+  .grid-row > * {
+    margin-right: 2px;
+    margin-bottom: 2px;
+  }
+  .grid-row > *:last-child {
+    margin-right: 0;
+  }
+}
+
 .grid-row:last-child {
   margin-bottom: 0;
 }
@@ -247,26 +346,40 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  -webkit-transition: all 0.2s ease;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Only apply hover on devices that support hover */
+@media (hover: hover) and (pointer: fine) {
+  .square-btn:hover:not(:disabled) {
+    transform: translateY(-3px);
+    -webkit-transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 150, 255, 0.5);
+  }
 }
 
 .square-btn:active:not(:disabled) {
   transform: translateY(-0.5px);
+  -webkit-transform: translateY(-0.5px);
 }
 
 .clicked {
   background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
   color: white;
+  -webkit-animation: clickSuccess 0.3s ease;
   animation: clickSuccess 0.3s ease;
 }
 
 .misclicked {
   background: linear-gradient(135deg, #ef5350 0%, #d32f2f 100%);
   color: white;
+  -webkit-animation: shake 0.5s ease;
   animation: shake 0.5s ease;
 }
 
-@keyframes clickSuccess {
+/* Webkit prefix for clickSuccess animation */
+@-webkit-keyframes clickSuccess {
   0%,
   100% {
     transform: scale(1);
@@ -276,7 +389,20 @@ body {
   }
 }
 
-@keyframes shake {
+@keyframes clickSuccess {
+  0%,
+  100% {
+    transform: scale(1);
+    -webkit-transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+    -webkit-transform: scale(1.1);
+  }
+}
+
+/* Webkit prefix for shake animation */
+@-webkit-keyframes shake {
   0%,
   100% {
     transform: translateX(0);
@@ -289,11 +415,34 @@ body {
   }
 }
 
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+    -webkit-transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+    -webkit-transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+    -webkit-transform: translateX(5px);
+  }
+}
+
 #control-buttons {
   display: flex;
   justify-content: center;
   gap: 15px;
   margin-top: 20px;
+}
+
+/* Fallback for older browsers without gap support */
+@supports not (gap: 15px) {
+  #control-buttons > * {
+    margin: 0 7.5px;
+  }
 }
 
 .control-btn {
@@ -303,6 +452,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  -webkit-transition: all 0.3s ease;
   font-size: 16px;
 }
 
@@ -311,9 +461,18 @@ body {
   color: white;
 }
 
-#new-game-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(255, 152, 0, 0.4);
+/* Only apply hover on devices that support hover */
+@media (hover: hover) and (pointer: fine) {
+  #new-game-btn:hover {
+    transform: translateY(-2px);
+    -webkit-transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(255, 152, 0, 0.4);
+  }
+}
+
+#new-game-btn:active {
+  transform: translateY(0);
+  -webkit-transform: translateY(0);
 }
 
 #game-modal {
@@ -327,7 +486,18 @@ body {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  -webkit-animation: fadeIn 0.3s ease;
   animation: fadeIn 0.3s ease;
+}
+
+/* Webkit prefix for fadeIn animation */
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeIn {
@@ -349,16 +519,31 @@ body {
   width: 90%;
   border: 2px solid #0096ff;
   box-shadow: 0 10px 40px rgba(0, 150, 255, 0.3);
+  -webkit-animation: slideUp 0.4s ease;
   animation: slideUp 0.4s ease;
 }
 
-@keyframes slideUp {
+/* Webkit prefix for slideUp animation */
+@-webkit-keyframes slideUp {
   from {
     transform: translateY(50px);
     opacity: 0;
   }
   to {
     transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    -webkit-transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    -webkit-transform: translateY(0);
     opacity: 1;
   }
 }
@@ -397,14 +582,25 @@ body {
   cursor: pointer;
   font-size: 16px;
   transition: all 0.3s ease;
+  -webkit-transition: all 0.3s ease;
   margin: 5px;
 }
 
-.modal-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 150, 255, 0.5);
+/* Only apply hover on devices that support hover */
+@media (hover: hover) and (pointer: fine) {
+  .modal-btn:hover {
+    transform: translateY(-2px);
+    -webkit-transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 150, 255, 0.5);
+  }
 }
 
+.modal-btn:active {
+  transform: translateY(0);
+  -webkit-transform: translateY(0);
+}
+
+/* Media Queries for Responsive Design */
 @media (max-width: 768px) {
   #title {
     font-size: 2rem;
@@ -423,6 +619,18 @@ body {
   #setup-screen {
     padding: 25px;
   }
+
+  .modal-content {
+    padding: 30px;
+  }
+
+  .modal-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .modal-content p {
+    font-size: 1rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -438,5 +646,57 @@ body {
 
   #setup-screen {
     padding: 20px;
+  }
+
+  .modal-content {
+    padding: 25px;
+  }
+
+  .modal-content h2 {
+    font-size: 1.3rem;
+  }
+
+  .modal-stats div {
+    font-size: 0.95rem;
+  }
+
+  #header-logo {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    -webkit-animation-duration: 0.01ms !important;
+    -webkit-transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white;
+  }
+
+  #game-modal {
+    display: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .radio-option {
+    border: 3px solid;
+  }
+
+  .square-btn {
+    border: 2px solid;
   }
 }
