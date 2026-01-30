@@ -6,7 +6,7 @@ const CONFIG = {
   LOSE_DELAY: 200,
   GAME_TYPES: {
     normal: { min: 1, max: 64, count: 64, label: "Normal" },
-    expand: { min: 1, max: 99, count: 64, label: "Expand" },
+    expand: { min: 1, max: 128, count: 64, label: "Expand" },
     insane: { min: 100, max: 999, count: 64, label: "Insane" },
   },
 };
@@ -90,19 +90,19 @@ class NumClickGame {
   startGame() {
     // Get selected options
     this.gameType = document.querySelector(
-      'input[name="gameType"]:checked'
+      'input[name="gameType"]:checked',
     ).value;
     this.sortOrder = document.querySelector(
-      'input[name="sortOrder"]:checked'
+      'input[name="sortOrder"]:checked',
     ).value;
     this.clickFeedback = document.querySelector(
-      'input[name="clickFeedback"]:checked'
+      'input[name="clickFeedback"]:checked',
     ).value;
     this.timerMode = document.querySelector(
-      'input[name="timerMode"]:checked'
+      'input[name="timerMode"]:checked',
     ).value;
     this.countdownMinutes = parseInt(
-      document.getElementById("countdown-minutes").value
+      document.getElementById("countdown-minutes").value,
     );
 
     // Update display
@@ -165,7 +165,7 @@ class NumClickGame {
       // Expand: Random 64 numbers from 1-99
       const range = Array.from(
         { length: config.max - config.min + 1 },
-        (_, i) => i + config.min
+        (_, i) => i + config.min,
       );
 
       const selected = [];
@@ -179,7 +179,7 @@ class NumClickGame {
       // Insane: Random 64 numbers from 100-999
       const range = Array.from(
         { length: config.max - config.min + 1 },
-        (_, i) => i + config.min
+        (_, i) => i + config.min,
       );
 
       const selected = [];
@@ -343,7 +343,7 @@ class NumClickGame {
         const displaySeconds = seconds % 60;
 
         document.getElementById("watch").textContent = `${String(
-          minutes
+          minutes,
         ).padStart(2, "0")}:${String(displaySeconds).padStart(2, "0")}`;
 
         // Add warning animation when less than 30 seconds
@@ -361,7 +361,7 @@ class NumClickGame {
         const displaySeconds = seconds % 60;
 
         document.getElementById("watch").textContent = `${String(
-          minutes
+          minutes,
         ).padStart(2, "0")}:${String(displaySeconds).padStart(2, "0")}`;
       }, CONFIG.TIMER_UPDATE_INTERVAL);
     }
@@ -394,7 +394,7 @@ class NumClickGame {
   updateMatch() {
     const total = this.sortedNumbers.length;
     document.getElementById("match").textContent = `${String(
-      this.currentIndex
+      this.currentIndex,
     ).padStart(2, "0")}/${String(total).padStart(2, "0")}`;
   }
 
@@ -409,7 +409,7 @@ class NumClickGame {
     const minutes = Math.floor(seconds / 60);
     const displaySeconds = seconds % 60;
     const timeString = `${String(minutes).padStart(2, "0")}:${String(
-      displaySeconds
+      displaySeconds,
     ).padStart(2, "0")}`;
 
     document.getElementById("score").textContent = timeString;
@@ -451,7 +451,7 @@ class NumClickGame {
       const bestMinutes = Math.floor(bestTime / 60000);
       const bestSeconds = Math.floor((bestTime % 60000) / 1000);
       const bestString = `${String(bestMinutes).padStart(2, "0")}:${String(
-        bestSeconds
+        bestSeconds,
       ).padStart(2, "0")}`;
 
       modal.innerHTML = `
@@ -481,11 +481,11 @@ class NumClickGame {
               <p>You ran out of time!</p>
               <div class="modal-stats">
                 <div>Progress: <strong>${this.currentIndex}/${
-        this.sortedNumbers.length
-      }</strong></div>
+                  this.sortedNumbers.length
+                }</strong></div>
                 <div>Time Limit: <strong>${this.countdownMinutes} minute${
-        this.countdownMinutes > 1 ? "s" : ""
-      }</strong></div>
+                  this.countdownMinutes > 1 ? "s" : ""
+                }</strong></div>
               </div>
               <button class="modal-btn" onclick="game.closeModal(); game.backToSetup();">
                 Main Menu
@@ -509,7 +509,7 @@ class NumClickGame {
     `;
     } else {
       const expectedNum = this.formatNumber(
-        this.sortedNumbers[this.currentIndex]
+        this.sortedNumbers[this.currentIndex],
       );
 
       modal.innerHTML = `
@@ -518,11 +518,11 @@ class NumClickGame {
               <p>You clicked the wrong number!</p>
               <div class="modal-stats">
                 <div>Progress: <strong>${this.currentIndex}/${
-        this.sortedNumbers.length
-      }</strong></div>
+                  this.sortedNumbers.length
+                }</strong></div>
                 <div>Expected: <strong>${expectedNum}</strong></div>
                 <div>Clicked: <strong>${this.formatNumber(
-                  clickedNum
+                  clickedNum,
                 )}</strong></div>
               </div>
               <button class="modal-btn" onclick="game.closeModal(); game.backToSetup();">
@@ -567,7 +567,7 @@ class NumClickGame {
       const minutes = Math.floor(totalSeconds / 60);
       const seconds = totalSeconds % 60;
       document.getElementById("watch").textContent = `${String(
-        minutes
+        minutes,
       ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     } else {
       document.getElementById("watch").textContent = "00:00";
@@ -599,7 +599,7 @@ class NumClickGame {
   saveBestScores() {
     localStorage.setItem(
       "numclick-best-scores-v2",
-      JSON.stringify(this.bestScores)
+      JSON.stringify(this.bestScores),
     );
   }
 }
