@@ -2,8 +2,8 @@
 const CONFIG = {
   GRID_SIZE: 8,
   TIMER_UPDATE_INTERVAL: 100,
-  WIN_DELAY: 200,
-  LOSE_DELAY: 200,
+  WIN_DELAY: 1000,
+  LOSE_DELAY: 1000,
   GAME_TYPES: {
     normal: { min: 1, max: 64, count: 64, label: "Normal" },
     expand: { min: 1, max: 128, count: 64, label: "Expand" },
@@ -28,23 +28,56 @@ class NumClickGame {
     this.countdownTimeLeft = 0;
     this.clickedButtons = [];
     this.bestScores = this.loadBestScores();
+    this.currentTheme = "grey";
 
     this.init();
   }
 
   init() {
     this.attachSetupListeners();
+    const savedTheme = localStorage.getItem("numclick-theme") || "grey";
+    const themeElement = document.getElementById(`theme-${savedTheme}`);
+    this.setTheme(savedTheme, themeElement);
+  }
+
+  toggleSettings() {
+    const modal = document.getElementById("settings-modal");
+    if (modal.style.display === "none" || modal.style.display === "") {
+      modal.style.display = "flex";
+    } else {
+      modal.style.display = "none";
+    }
+  }
+
+  setTheme(theme, element) {
+    this.currentTheme = theme;
+
+    const options = document.querySelectorAll("#settings-modal .radio-option");
+    options.forEach((opt) => opt.classList.remove("selected"));
+
+    if (element) {
+      element.classList.add("selected");
+      const input = element.querySelector("input");
+      if (input) input.checked = true;
+    }
+
+    if (theme === "grey") {
+      document.documentElement.removeAttribute("data-theme");
+    } else {
+      document.documentElement.setAttribute("data-theme", theme);
+    }
+
+    localStorage.setItem("numclick-theme", theme);
   }
 
   attachSetupListeners() {
-    // Radio button selection highlighting
-    // Radio button selection highlighting AND visibility logic
     document.querySelectorAll(".radio-option").forEach((option) => {
+      if (option.closest("#settings-modal")) return;
+
       option.addEventListener("click", (e) => {
         const input = option.querySelector('input[type="radio"]');
         input.checked = true;
 
-        // Update selected styling for this group
         const groupName = input.name;
         document
           .querySelectorAll(`input[name="${groupName}"]`)
@@ -53,7 +86,6 @@ class NumClickGame {
           });
         option.classList.add("selected");
 
-        // FIX: Manually trigger the visibility check for the countdown selector
         const countdownSelector = document.getElementById("countdown-selector");
         if (groupName === "timerMode") {
           if (input.value === "countdown") {
@@ -65,21 +97,18 @@ class NumClickGame {
       });
     });
 
-    // Update countdown time display and highlight the correct label
     const rangeInput = document.getElementById("countdown-minutes");
     const labels = document.querySelectorAll(".time-label");
 
     if (rangeInput) {
       rangeInput.addEventListener("input", (e) => {
         const selectedVal = parseInt(e.target.value);
-
         labels.forEach((label) => {
-          // Check the data-value attribute we added to the spans
           if (parseInt(label.getAttribute("data-value")) === selectedVal) {
-            label.style.color = "#0096ff"; // Highlight selected in blue
+            label.style.color = "var(--accent)";
             label.style.fontWeight = "600";
           } else {
-            label.style.color = "#888"; // Dim others
+            label.style.color = "var(--btn-text)";
             label.style.fontWeight = "400";
           }
         });
@@ -88,7 +117,6 @@ class NumClickGame {
   }
 
   startGame() {
-    // Get selected options
     this.gameType = document.querySelector(
       'input[name="gameType"]:checked',
     ).value;
@@ -105,7 +133,6 @@ class NumClickGame {
       document.getElementById("countdown-minutes").value,
     );
 
-    // Update display
     const config = CONFIG.GAME_TYPES[this.gameType];
     document.getElementById("mode-display").textContent = config.label;
     document.getElementById("sort-display").textContent =
@@ -113,31 +140,23 @@ class NumClickGame {
     document.getElementById("click-display").textContent =
       this.clickFeedback === "enabled" ? "Enabled" : "Disabled";
 
-    // Update clock icon based on timer mode
-    const clockContainer = document.getElementById("clock-container");
-    const clockIcon = clockContainer.querySelector(".icon");
+    const clockIcon = document.querySelector("#clock-pill .icon");
     if (this.timerMode === "countdown") {
       clockIcon.textContent = "⏳";
-      clockContainer.classList.add("countdown-mode");
     } else {
       clockIcon.textContent = "⏱️";
-      clockContainer.classList.remove("countdown-mode");
     }
 
-    // Hide setup, show game
     document.getElementById("setup-screen").style.display = "none";
     document.getElementById("game-screen").style.display = "block";
 
-    // Initialize game
     this.resetGame();
   }
 
   backToSetup() {
-    // Only show confirmation if the game is actually running
     if (this.startTime && !this.gameOver) {
       this.showModal("confirmExit");
     } else {
-      // If game isn't started or is already over, go back immediately
       this.confirmBackToSetup();
     }
   }
@@ -147,10 +166,8 @@ class NumClickGame {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
     }
-
     document.getElementById("setup-screen").style.display = "block";
     document.getElementById("game-screen").style.display = "none";
-
     this.gameOver = false;
     this.currentIndex = 0;
     this.startTime = null;
@@ -161,27 +178,11 @@ class NumClickGame {
     const config = CONFIG.GAME_TYPES[gameType];
     let numbers = [];
 
-    if (gameType === "expand") {
-      // Expand: Random 64 numbers from 1-99
+    if (gameType === "expand" || gameType === "insane") {
       const range = Array.from(
         { length: config.max - config.min + 1 },
         (_, i) => i + config.min,
       );
-
-      const selected = [];
-      for (let i = 0; i < config.count; i++) {
-        const randomIndex = Math.floor(Math.random() * range.length);
-        selected.push(range[randomIndex]);
-        range.splice(randomIndex, 1);
-      }
-      numbers = selected;
-    } else if (gameType === "insane") {
-      // Insane: Random 64 numbers from 100-999
-      const range = Array.from(
-        { length: config.max - config.min + 1 },
-        (_, i) => i + config.min,
-      );
-
       const selected = [];
       for (let i = 0; i < config.count; i++) {
         const randomIndex = Math.floor(Math.random() * range.length);
@@ -190,11 +191,9 @@ class NumClickGame {
       }
       numbers = selected;
     } else {
-      // Normal: Sequential 1-64
       numbers = Array.from({ length: config.count }, (_, i) => i + config.min);
     }
 
-    // Sort based on user selection
     if (this.sortOrder === "ascending") {
       return numbers.sort((a, b) => a - b);
     } else {
@@ -213,9 +212,9 @@ class NumClickGame {
 
   formatNumber(num) {
     if (this.gameType === "insane") {
-      return String(num); // 100-999 already 3 digits
+      return String(num);
     } else {
-      return String(num).padStart(2, "0"); // 01-99 format
+      return String(num).padStart(2, "0");
     }
   }
 
@@ -238,11 +237,9 @@ class NumClickGame {
 
         row.appendChild(button);
       }
-
       container.appendChild(row);
     }
 
-    // Attach event listeners
     container.addEventListener("click", (e) => {
       if (e.target.classList.contains("square-btn") && !this.gameOver) {
         const number = parseInt(e.target.dataset.number);
@@ -252,54 +249,34 @@ class NumClickGame {
   }
 
   checkNumber(button, number) {
-    if (!button || typeof number !== "number") {
-      console.error("Invalid button or number");
-      return;
-    }
-
+    if (!button || typeof number !== "number") return;
     if (this.gameOver || button.disabled) return;
 
     const expectedNumber = this.sortedNumbers[this.currentIndex];
 
     if (number === expectedNumber) {
-      // Correct click
       button.disabled = true;
-
-      // Store clicked button for later coloring if click feedback is disabled
       this.clickedButtons.push({ button, correct: true });
 
-      // Apply color immediately if click feedback is enabled
       if (this.clickFeedback === "enabled") {
         button.classList.add("clicked");
       }
 
       this.currentIndex++;
-      this.updateMatch();
 
       if (this.currentIndex >= this.sortedNumbers.length) {
-        // Win condition
         this.gameOver = true;
         const finalTime = this.stopTimer();
-
-        // Show all colors if click feedback was disabled
-        if (this.clickFeedback === "disabled") {
-          this.revealAllClicks();
-        }
-
+        if (this.clickFeedback === "disabled") this.revealAllClicks();
         this.handleWin(finalTime);
       }
     } else {
-      // Wrong click
       this.gameOver = true;
-
-      // Store this button as incorrect
       this.clickedButtons.push({ button, correct: false });
 
-      // Apply color immediately if click feedback is enabled
       if (this.clickFeedback === "enabled") {
         button.classList.add("misclicked");
       } else {
-        // Reveal all clicks including this wrong one
         this.revealAllClicks();
         button.classList.add("misclicked");
       }
@@ -311,7 +288,6 @@ class NumClickGame {
   }
 
   revealAllClicks() {
-    // Show all previously clicked buttons
     this.clickedButtons.forEach(({ button, correct }) => {
       if (correct) {
         button.classList.add("clicked");
@@ -325,15 +301,12 @@ class NumClickGame {
     this.startTime = Date.now();
 
     if (this.timerMode === "countdown") {
-      // Countdown mode
-      this.countdownTimeLeft = this.countdownMinutes * 60 * 1000; // Convert to milliseconds
-
+      this.countdownTimeLeft = this.countdownMinutes * 60 * 1000;
       this.timerInterval = setInterval(() => {
         const elapsed = Date.now() - this.startTime;
         const remaining = this.countdownTimeLeft - elapsed;
 
         if (remaining <= 0) {
-          // Time's up!
           this.handleTimeUp();
           return;
         }
@@ -341,28 +314,17 @@ class NumClickGame {
         const seconds = Math.floor(remaining / 1000);
         const minutes = Math.floor(seconds / 60);
         const displaySeconds = seconds % 60;
-
-        document.getElementById("watch").textContent = `${String(
-          minutes,
-        ).padStart(2, "0")}:${String(displaySeconds).padStart(2, "0")}`;
-
-        // Add warning animation when less than 30 seconds
-        const clockContainer = document.getElementById("clock-container");
-        if (remaining <= 30000) {
-          clockContainer.classList.add("countdown-warning");
-        }
+        document.getElementById("watch").textContent =
+          `${String(minutes).padStart(2, "0")}:${String(displaySeconds).padStart(2, "0")}`;
       }, CONFIG.TIMER_UPDATE_INTERVAL);
     } else {
-      // Normal mode (count up)
       this.timerInterval = setInterval(() => {
         const elapsed = Date.now() - this.startTime;
         const seconds = Math.floor(elapsed / 1000);
         const minutes = Math.floor(seconds / 60);
         const displaySeconds = seconds % 60;
-
-        document.getElementById("watch").textContent = `${String(
-          minutes,
-        ).padStart(2, "0")}:${String(displaySeconds).padStart(2, "0")}`;
+        document.getElementById("watch").textContent =
+          `${String(minutes).padStart(2, "0")}:${String(displaySeconds).padStart(2, "0")}`;
       }, CONFIG.TIMER_UPDATE_INTERVAL);
     }
   }
@@ -370,17 +332,12 @@ class NumClickGame {
   handleTimeUp() {
     this.gameOver = true;
     this.stopTimer();
-
-    // Reveal all clicks if click feedback was disabled
-    if (this.clickFeedback === "disabled") {
-      this.revealAllClicks();
-    }
-
+    if (this.clickFeedback === "disabled") this.revealAllClicks();
     this.disableAllButtons();
 
     setTimeout(() => {
       this.showModal("timeout");
-    }, CONFIG.LOSE_DELAY);
+    }, CONFIG.LOSE_DELAY / 1000);
   }
 
   stopTimer() {
@@ -389,13 +346,6 @@ class NumClickGame {
       this.timerInterval = null;
     }
     return this.startTime ? Date.now() - this.startTime : 0;
-  }
-
-  updateMatch() {
-    const total = this.sortedNumbers.length;
-    document.getElementById("match").textContent = `${String(
-      this.currentIndex,
-    ).padStart(2, "0")}/${String(total).padStart(2, "0")}`;
   }
 
   disableAllButtons() {
@@ -408,13 +358,10 @@ class NumClickGame {
     const seconds = Math.floor(finalTime / 1000);
     const minutes = Math.floor(seconds / 60);
     const displaySeconds = seconds % 60;
-    const timeString = `${String(minutes).padStart(2, "0")}:${String(
-      displaySeconds,
-    ).padStart(2, "0")}`;
+    const timeString = `${String(minutes).padStart(2, "0")}:${String(displaySeconds).padStart(2, "0")}`;
 
     document.getElementById("score").textContent = timeString;
 
-    // Update best score (only for normal timer mode, not countdown)
     let isBestScore = false;
     if (this.timerMode === "normal") {
       const key = `${this.gameType}_${this.sortOrder}_${this.clickFeedback}_${this.timerMode}`;
@@ -444,102 +391,78 @@ class NumClickGame {
     const config = CONFIG.GAME_TYPES[this.gameType];
     const sortLabel =
       this.sortOrder === "ascending" ? "Ascending" : "Descending";
+    const currentProgress = this.currentIndex;
+    const totalProgress = this.sortedNumbers.length;
 
     if (type === "win") {
       const key = `${this.gameType}_${this.sortOrder}_${this.clickFeedback}_${this.timerMode}`;
       const bestTime = this.bestScores[key];
-      const bestMinutes = Math.floor(bestTime / 60000);
-      const bestSeconds = Math.floor((bestTime % 60000) / 1000);
-      const bestString = `${String(bestMinutes).padStart(2, "0")}:${String(
-        bestSeconds,
-      ).padStart(2, "0")}`;
+      let bestString;
+
+      if (bestTime) {
+        const bestMinutes = Math.floor(bestTime / 60000);
+        const bestSeconds = Math.floor((bestTime % 60000) / 1000);
+        bestString = `${String(bestMinutes).padStart(2, "0")}:${String(bestSeconds).padStart(2, "0")}`;
+      } else {
+        bestString = timeString;
+      }
 
       modal.innerHTML = `
-            <div class="modal-content">
-              <h2>🎉 Congratulations!</h2>
-              <p>You completed the challenge!</p>
-              <div class="modal-stats">
-                <div>🎮 Mode: <strong>${config.label}</strong></div>
-                <div>📊 Sort: <strong>${sortLabel}</strong></div>
-                <div>⏱️ Time: <strong>${timeString}</strong></div>
-                <div>🏆 Best: <strong>${bestString}</strong></div>
-                ${
-                  isBestScore
-                    ? '<div style="color: #ffd700;">⭐ NEW RECORD! ⭐</div>'
-                    : ""
-                }
-              </div>
-              <button class="modal-btn" onclick="game.closeModal(); game.backToSetup();">
-                Main Menu
-              </button>
-            </div>
-          `;
+        <div class="modal-content">
+          <h2 style="color: var(--accent)">🎉 Congratulations!</h2>
+          <div class="modal-stats">
+            <div>Mode: <strong>${config.label}</strong></div>
+            <div>Sort: <strong>${sortLabel}</strong></div>
+            <div>Time: <strong>${timeString}</strong></div>
+            <div>Best: <strong>${bestString}</strong></div>
+            ${isBestScore ? '<div style="color: var(--warning); margin-top: 10px; font-weight: bold; text-align: center;">⭐ NEW RECORD! ⭐</div>' : ""}
+          </div>
+          <button class="modal-btn" onclick="game.closeModal(); game.backToSetup();">Main Menu</button>
+        </div>
+      `;
     } else if (type === "timeout") {
       modal.innerHTML = `
-            <div class="modal-content">
-              <h2>⏳ Time's Up!</h2>
-              <p>You ran out of time!</p>
-              <div class="modal-stats">
-                <div>Progress: <strong>${this.currentIndex}/${
-                  this.sortedNumbers.length
-                }</strong></div>
-                <div>Time Limit: <strong>${this.countdownMinutes} minute${
-                  this.countdownMinutes > 1 ? "s" : ""
-                }</strong></div>
-              </div>
-              <button class="modal-btn" onclick="game.closeModal(); game.backToSetup();">
-                Main Menu
-              </button>
-            </div>
-          `;
+        <div class="modal-content">
+          <h2 style="color: var(--error)">⏳ Time's Up!</h2>
+          <div class="modal-stats">
+            <div>Limit: <strong>${this.countdownMinutes} min</strong></div>
+            <div>Progress: <strong style="color: var(--accent)">${currentProgress}/${totalProgress}</strong></div>
+          </div>
+          <button class="modal-btn" onclick="game.closeModal(); game.backToSetup();">Main Menu</button>
+        </div>
+      `;
     } else if (type == "confirmExit") {
       modal.innerHTML = `
         <div class="modal-content">
-          <h2>⚠️ Quit Game?</h2>
-          <p>Are you sure you want to go back to the main menu? Your current progress will be lost.</p>
-          <div class="modal-buttons" style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-            <button class="modal-btn" style="background: #ef5350;" onclick="game.closeModal(); game.confirmBackToSetup();">
-              Yes!
-            </button>
-            <button class="modal-btn" onclick="game.closeModal();">
-              No
-            </button>
+          <h2 style="color: var(--warning)">⚠️ Quit Game?</h2>
+          <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="modal-btn" style="background: var(--error);" onclick="game.closeModal(); game.confirmBackToSetup();">Yes</button>
+            <button class="modal-btn" onclick="game.closeModal();">No</button>
           </div>
         </div>
-    `;
+      `;
     } else {
       const expectedNum = this.formatNumber(
         this.sortedNumbers[this.currentIndex],
       );
-
       modal.innerHTML = `
-            <div class="modal-content">
-              <h2>❌ Game Over</h2>
-              <p>You clicked the wrong number!</p>
-              <div class="modal-stats">
-                <div>Progress: <strong>${this.currentIndex}/${
-                  this.sortedNumbers.length
-                }</strong></div>
-                <div>Expected: <strong>${expectedNum}</strong></div>
-                <div>Clicked: <strong>${this.formatNumber(
-                  clickedNum,
-                )}</strong></div>
-              </div>
-              <button class="modal-btn" onclick="game.closeModal(); game.backToSetup();">
-                Main Menu
-              </button>
-            </div>
-          `;
+        <div class="modal-content">
+          <h2 style="color: var(--error)">❌ Game Over</h2>
+          <div class="modal-stats">
+            <div>Progress: <strong style="color: var(--accent)">${currentProgress}/${totalProgress}</strong></div>
+            <div>Expected: <strong style="color: var(--correct)">${expectedNum}</strong></div>
+            <div>Clicked: <strong style="color: var(--error)">${this.formatNumber(clickedNum)}</strong></div>
+          </div>
+          <button class="modal-btn" onclick="game.closeModal(); game.backToSetup();">Main Menu</button>
+        </div>
+      `;
     }
-
     document.body.appendChild(modal);
   }
 
   closeModal() {
     const modal = document.getElementById("game-modal");
-    if (modal) {
-      modal.remove();
-    }
+    if (modal) modal.remove();
   }
 
   resetGame() {
@@ -554,40 +477,21 @@ class NumClickGame {
       this.timerInterval = null;
     }
 
-    // Remove countdown warning styling
-    const clockContainer = document.getElementById("clock-container");
-    clockContainer.classList.remove("countdown-warning");
-
-    // Reset displays
-    const config = CONFIG.GAME_TYPES[this.gameType];
-
     if (this.timerMode === "countdown") {
-      // Show initial countdown time
       const totalSeconds = this.countdownMinutes * 60;
       const minutes = Math.floor(totalSeconds / 60);
       const seconds = totalSeconds % 60;
-      document.getElementById("watch").textContent = `${String(
-        minutes,
-      ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+      document.getElementById("watch").textContent =
+        `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     } else {
       document.getElementById("watch").textContent = "00:00";
     }
 
-    document.getElementById("match").textContent =
-      "00/" + String(config.count).padStart(2, "0");
     document.getElementById("score").textContent = "--:--";
 
-    // Generate new numbers
     this.sortedNumbers = this.generateNumbers(this.gameType);
     this.shuffledNumbers = this.shuffleArray(this.sortedNumbers);
-
-    // Update match display
-    this.updateMatch();
-
-    // Create new board
     this.createBoard();
-
-    // FIX: Start the timer immediately after the board is created
     this.startTimer();
   }
 
@@ -604,16 +508,11 @@ class NumClickGame {
   }
 }
 
-// Initialize game
 const game = new NumClickGame();
 
-//To prevent accidental reloads
 window.addEventListener("beforeunload", (event) => {
-  // Only trigger if the game is currently active
   if (game.startTime && !game.gameOver) {
-    // Standard way to trigger the browser's confirmation dialog
     event.preventDefault();
-    // Modern browsers require the returnValue to be set
     event.returnValue = "";
   }
 });

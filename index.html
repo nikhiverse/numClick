@@ -12,11 +12,10 @@
       <div id="header-container">
         <img src="pics/logo.png" alt="NumClick Logo" id="header-logo" />
         <h1 id="title">numClick</h1>
+        <div id="settings-trigger" onclick="game.toggleSettings()">⚙️</div>
       </div>
 
-      <!-- Setup Screen -->
       <div id="setup-screen">
-        <!-- Game Type -->
         <div class="setup-section">
           <h3>Game Type</h3>
           <div class="difficulty-options">
@@ -41,7 +40,6 @@
           </div>
         </div>
 
-        <!-- Sorting Order -->
         <div class="setup-section">
           <h3>Select Sorting</h3>
           <div class="difficulty-options">
@@ -67,7 +65,6 @@
           </div>
         </div>
 
-        <!-- Click Feedback -->
         <div class="setup-section">
           <h3>Click Feedback</h3>
           <div class="difficulty-options">
@@ -93,7 +90,6 @@
           </div>
         </div>
 
-        <!-- Timer Mode -->
         <div class="setup-section">
           <h3>Timer Mode</h3>
           <div class="difficulty-options">
@@ -118,12 +114,11 @@
             </div>
           </div>
 
-          <!-- Countdown Time Selector (hidden by default) -->
           <div id="countdown-selector" style="display: none; margin-top: 15px">
             <label
               for="countdown-minutes"
               style="
-                color: #ffffff;
+                color: var(--text-main);
                 display: block;
                 margin-bottom: 10px;
                 font-size: 0.75rem;
@@ -137,45 +132,24 @@
               min="1"
               max="5"
               value="3"
-              style="width: 100%; cursor: pointer; accent-color: #0096ff"
             />
             <div
               style="
                 display: flex;
                 justify-content: space-between;
-                margin-top: 5px;
+                margin-top: 8px;
               "
             >
-              <span
-                class="time-label"
-                data-value="1"
-                style="color: #888; font-size: 0.85rem"
-                >1 min</span
-              >
-              <span
-                class="time-label"
-                data-value="2"
-                style="color: #888; font-size: 0.85rem"
-                >2 min</span
-              >
+              <span class="time-label" data-value="1">1 min</span>
+              <span class="time-label" data-value="2">2 min</span>
               <span
                 class="time-label"
                 data-value="3"
-                style="color: #0096ff; font-weight: 600; font-size: 0.85rem"
+                style="color: var(--accent); font-weight: 600"
                 >3 min</span
               >
-              <span
-                class="time-label"
-                data-value="4"
-                style="color: #888; font-size: 0.85rem"
-                >4 min</span
-              >
-              <span
-                class="time-label"
-                data-value="5"
-                style="color: #888; font-size: 0.85rem"
-                >5 min</span
-              >
+              <span class="time-label" data-value="4">4 min</span>
+              <span class="time-label" data-value="5">5 min</span>
             </div>
           </div>
         </div>
@@ -185,36 +159,29 @@
         </button>
       </div>
 
-      <!-- Game Screen -->
-      <div id="game-screen">
+      <div id="game-screen" style="display: none">
         <div id="game-header">
-          <div class="game-info">
-            Mode: <span id="mode-display">Normal</span>
-          </div>
-          <div class="game-info">
-            Sort: <span id="sort-display">Ascending</span>
-          </div>
-          <div class="game-info">
-            Color: <span id="click-display">Enabled</span>
+          <div class="game-info-bar">
+            <span>Mode: <strong id="mode-display">Normal</strong></span>
+            <span>Sort: <strong id="sort-display">Ascending</strong></span>
+            <span>Color: <strong id="click-display">Enabled</strong></span>
           </div>
         </div>
 
         <div id="game-container">
-          <div id="timer-container">
-            <div id="medal-container">
-              <div class="icon">🏅</div>
-              <div id="match">00/64</div>
+          <div id="stats-header">
+            <div class="stat-pill" id="trophy-pill">
+              <span class="icon">🏆</span>
+              <span id="score">--:--</span>
             </div>
-            <div id="trophy-container">
-              <div class="icon">🏆</div>
-              <div id="score">--:--</div>
-            </div>
-            <div id="clock-container">
-              <div class="icon">⏱️</div>
-              <div id="watch">00:00</div>
+            <div class="stat-pill" id="clock-pill">
+              <span class="icon">⏱️</span>
+              <span id="watch">00:00</span>
             </div>
           </div>
+
           <div id="square-container"></div>
+
           <div id="control-buttons">
             <button
               id="new-game-btn"
@@ -227,6 +194,48 @@
         </div>
       </div>
     </div>
+
+    <div id="settings-modal" style="display: none">
+      <div class="modal-content settings-card">
+        <div class="modal-header">
+          <h2>Settings</h2>
+          <span class="close-settings" onclick="game.toggleSettings()"
+            >&times;</span
+          >
+        </div>
+
+        <div class="setup-section">
+          <h3>Appearance</h3>
+          <div class="difficulty-options">
+            <div
+              class="radio-option"
+              id="theme-light"
+              onclick="game.setTheme('light', this)"
+            >
+              <input type="radio" name="theme_setting" />
+              <label>Light</label>
+            </div>
+            <div
+              class="radio-option"
+              id="theme-dark"
+              onclick="game.setTheme('dark', this)"
+            >
+              <input type="radio" name="theme_setting" />
+              <label>Dark</label>
+            </div>
+            <div
+              class="radio-option selected"
+              id="theme-grey"
+              onclick="game.setTheme('grey', this)"
+            >
+              <input type="radio" name="theme_setting" checked />
+              <label>Grey</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="numClick.js"></script>
   </body>
 </html>
